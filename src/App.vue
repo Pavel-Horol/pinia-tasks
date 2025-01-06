@@ -6,10 +6,14 @@ import TaskForm from "./components/TaskForm.vue";
 import { storeToRefs } from "pinia";
 import TabAbout from "./components/TabAbout.vue";
 import TabHome from "./components/TabHome.vue";
+
 const tasksStore = useTaskStore();
 const { tasks, isLoading, favs, totalCount, favsCount } =
   storeToRefs(tasksStore);
 tasksStore.getTasks();
+const currentTasksType = computed(() => {
+  return filter.value === 'favs' ? favs : tasks
+})
 
 const amountTasks = computed(() => {
   return filter.value === "favs" ? favsCount : totalCount;
@@ -58,7 +62,7 @@ const filter = ref("all");
         Your have {{ amountTasks }} {{ amountTaskMessage}}
       </p>
       <transition-group tag="div" name="task">
-        <div v-for="task in filter === 'favs' ? favs : tasks" :key="task.id">
+        <div v-for="task in currentTasksType.value" :key="task.id">
           <TaskDetails :task="task" />
         </div>
       </transition-group>
