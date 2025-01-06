@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, onUpdated, ref } from "vue";
+import { computed, onMounted, onUpdated, ref } from "vue";
 import TaskDetails from "./components/TaskDetails.vue";
 import { useTaskStore } from "./stores/TasksStore";
 import TaskForm from "./components/TaskForm.vue";
@@ -11,11 +11,18 @@ const { tasks, isLoading, favs, totalCount, favsCount } =
   storeToRefs(tasksStore);
 tasksStore.getTasks();
 
+const amountTasks = computed(() => {
+  return filter.value === "favs" ? favsCount : totalCount;
+});
+const amountTaskMessage = computed(() => {
+  return (filter.value === "favs" ? favsCount.value : totalCount.value) === 1
+    ? "task"
+    : "tasks";
+});
 onMounted(() => console.log("Component mounted"));
 onUpdated(() => console.log("Component updated"));
 
 const currentTab = ref(TabHome);
-
 const filter = ref("all");
 </script>
 
@@ -48,18 +55,14 @@ const filter = ref("all");
     <!-- task list -->
     <div v-else class="task-list">
       <p>
-        Your have {{ filter === "favs" ? favsCount : totalCount }}
-        {{
-          (filter === "favs" ? favsCount : totalCount) === 1 ? "task" : "tasks"
-        }}
+        Your have {{ amountTasks }} {{ amountTaskMessage}}
       </p>
       <transition-group tag="div" name="task">
         <div v-for="task in filter === 'favs' ? favs : tasks" :key="task.id">
-            <TaskDetails :task="task" />
+          <TaskDetails :task="task" />
         </div>
       </transition-group>
     </div>
-    
 
     <!-- testing features -->
     <!-- <div style="margin: 60px auto; width: 60%;">
@@ -70,6 +73,7 @@ const filter = ref("all");
         <button @click="currentTab = TabAbout">About</button>
       </nav>
       <component :is="currentTab"></component>
+      <button @click="obj.pet.id++">pet id: {{ obj.pet.id }}</button>
     </div> -->
   </main>
 </template>

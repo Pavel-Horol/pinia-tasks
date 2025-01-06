@@ -61,6 +61,7 @@ export const useTaskStore = defineStore("taskStore", {
           headers: {
             "Content-type": "application/json",
           },
+          //@ts-ignore
           body: JSON.stringify({ isFav: updatedTask.isFav! }),
         });
       }
