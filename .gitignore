@@ -23,6 +23,7 @@ coverage
 data/*
 ./data*
 /data*
+data/
 
 !.vscode/extensions.json
 .idea
