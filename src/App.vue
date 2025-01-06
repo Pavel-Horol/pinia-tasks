@@ -1,18 +1,27 @@
 <script setup lang="ts">
-import { computed, onMounted, onUpdated, ref } from "vue";
+import { computed, onMounted, onUpdated, ref, watch } from "vue";
 import TaskDetails from "./components/TaskDetails.vue";
 import { useTaskStore } from "./stores/TasksStore";
 import TaskForm from "./components/TaskForm.vue";
 import { storeToRefs } from "pinia";
 import TabAbout from "./components/TabAbout.vue";
 import TabHome from "./components/TabHome.vue";
+import ChildComp from "./components/ChildComp.vue";
 
 const tasksStore = useTaskStore();
+const filter = ref("all");
 const { tasks, isLoading, favs, totalCount, favsCount } =
   storeToRefs(tasksStore);
 tasksStore.getTasks();
+
+const sortedTasks = computed(() => {
+    return [...tasks.value].sort((a, b) => a.title.localeCompare(b.title));
+});
+
 const currentTasksType = computed(() => {
-  return filter.value === 'favs' ? favs : tasks
+  if (filter.value === 'favs') return favs;
+  if (filter.value === 'sort') return sortedTasks;
+  return tasks;
 })
 
 const amountTasks = computed(() => {
@@ -27,7 +36,6 @@ onMounted(() => console.log("Component mounted"));
 onUpdated(() => console.log("Component updated"));
 
 const currentTab = ref(TabHome);
-const filter = ref("all");
 </script>
 
 <template>
@@ -51,6 +59,9 @@ const filter = ref("all");
       <button :class="{ active: filter === 'favs' }" @click="filter = 'favs'">
         Fav tasks
       </button>
+      <button :class="{ active: filter === 'sort' }" @click="filter = 'sort'">
+        Sort task
+      </button>
     </nav>
 
     <!-- loading -->
@@ -68,21 +79,18 @@ const filter = ref("all");
       </transition-group>
     </div>
 
-    <!-- testing features -->
-    <!-- <div style="margin: 60px auto; width: 60%;">
-      <hr />
-      <button @click="tasksStore.$reset">reset state</button>
-      <nav>
-        <button @click="currentTab = TabHome">Home</button>
-        <button @click="currentTab = TabAbout">About</button>
-      </nav>
-      <component :is="currentTab"></component>
-      <button @click="obj.pet.id++">pet id: {{ obj.pet.id }}</button>
+
+    <!-- <div>
+      <ChildComp class="red"/>
     </div> -->
+
   </main>
 </template>
 
-<style scoped>
+<style>
+.red {
+  color: red;
+}
 .filter button.active {
   background-color: #007bff;
   color: white;
@@ -105,3 +113,15 @@ const filter = ref("all");
   transition: transform 0.3s ease;
 }
 </style>
+
+    <!-- testing features -->
+    <!-- <div style="margin: 60px auto; width: 60%;">
+      <hr />
+      <button @click="tasksStore.$reset">reset state</button>
+      <nav>
+        <button @click="currentTab = TabHome">Home</button>
+        <button @click="currentTab = TabAbout">About</button>
+      </nav>
+      <component :is="currentTab"></component>
+      <button @click="obj.pet.id++">pet id: {{ obj.pet.id }}</button>
+    </div> -->

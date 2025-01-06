@@ -19,8 +19,7 @@ import { onUnmounted } from 'vue';
 
     defineProps(['task'])
     const taskStore = useTaskStore()
-
-onUnmounted(() => console.log('Task component unmounted'))
+    onUnmounted(() => console.log('Task component unmounted'))
 </script>
 
 <style>
